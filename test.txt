@@ -1,0 +1,10 @@
+total 60
+-rw-r--r-- 1 marko marko    10 Apr  7 18:33 batch.txt
+-rw-r--r-- 1 marko marko   210 Apr  6 23:04 Makefile
+-rwxr-xr-x 1 marko marko 18896 Apr  7 22:44 mishell
+-rw-r--r-- 1 marko marko  3848 Apr  7 22:44 mishell.c
+-rw-r--r-- 1 marko marko 15016 Apr  7 22:44 mishell.o
+-rw-r--r-- 1 marko marko  1132 Apr  7 18:23 strvec.c
+-rw-r--r-- 1 marko marko   429 Apr  7 18:19 strvec.h
+-rw-r--r-- 1 marko marko  2784 Apr  7 18:28 strvec.o
+-rw-r--r-- 1 marko marko     0 Apr  7 23:01 test.txt

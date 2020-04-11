@@ -1,5 +1,2 @@
-<<<<<<< HEAD
-ls -l & echo "hello"
-=======
+ls | grep job
 ls
->>>>>>> tmp

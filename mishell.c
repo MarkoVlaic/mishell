@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <stdbool.h>
 
@@ -23,35 +25,79 @@ void separate(StrVec* tokens, char* line, char* delim) {
     }
 }
 
+void process_piped(StrVec piped) {
+    Job* prev = NULL;
+    for(int i=0;i<piped.len;i++) {
+        StrVec tokens;
+        vec_init(&tokens);
+        separate(&tokens, vec_get(&piped, i), " ");
+
+        if(prev == NULL) {
+            Job job;
+            job_init(&job, vec_get(&tokens, 0), tokens, shell_state, STDIN_FILENO, STDOUT_FILENO);
+            prev = &job;
+            continue;
+        }
+
+        int pipefd[2];
+        int err = pipe(pipefd);
+
+        if(err == -1) {
+            report_error();
+            return;
+        }
+
+        prev->out_fd = pipefd[1];
+
+        Job* job = malloc(sizeof(Job));
+        job_init(job, vec_get(&tokens, 0), tokens, shell_state, pipefd[0], STDOUT_FILENO);
+
+        job_execute(prev);
+        prev = job;
+    }
+    job_execute(prev);
+}
+
+void process_parallel(char* chunk) {
+    StrVec piped;
+    vec_init(&piped);
+    separate(&piped, chunk, "|");
+
+    if(piped.len > 1) {
+        process_piped(piped);
+        return;
+    }
+    
+    char* redirect = strchr(chunk, '>');
+    int out_fd = STDOUT_FILENO;
+
+    if(redirect != NULL) {
+        *redirect = '\0';
+        redirect++;
+        out_fd = open(redirect, O_WRONLY | O_TRUNC | O_CREAT, S_IRWXO | S_IRWXG | S_IRWXU);
+    }
+
+    StrVec tokens;
+    vec_init(&tokens);
+    separate(&tokens, chunk, " ");
+
+    Job job;
+    job_init(&job, vec_get(&tokens, 0), tokens, shell_state, STDIN_FILENO, out_fd);
+
+    shell_execute(&shell_state, job);
+    vec_free(&tokens);
+}
+
 
 void process_line(char* line) {
     StrVec parallel;
     vec_init(&parallel);
     separate(&parallel, line, "&");
 
-    StrVec tokens;
-
     for(int i=0;i<parallel.len;i++) {
-        char* cmd = vec_get(&parallel, i);
-
-        char* out = strchr(cmd, '>');
-
-        if(out != NULL) {
-            *out = '\0';
-            out++;
-        }
-
-        vec_init(&tokens);
-        separate(&tokens, cmd, " ");
-
-        Job job;
-        job_init(&job, vec_get(&tokens, 0), tokens, shell_state, NULL, out);
-
-        shell_execute(&shell_state, job);
-        vec_clear(&tokens);
+        char* chunk = vec_get(&parallel, i);
+        process_parallel(chunk);
     }
-
-    //vec_free(&tokens);
 }
 
 void print_prompt(char* path) {

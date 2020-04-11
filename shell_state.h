@@ -13,7 +13,7 @@ typedef struct ShellState {
 } ShellState;
 
 void shell_init(ShellState* shell_state, bool batch);
-void shell_execute(ShellState* shell_state, struct Job* job);
+void shell_execute(ShellState* shell_state, struct Job job);
 void shell_execute_built_in(ShellState* shell_state, StrVec* tokens);
 
 // Not really tied to the struct but a global shell function

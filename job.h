@@ -7,14 +7,14 @@
 #define JOB_H
 
 typedef struct Job {
-    FILE* in;
-    FILE* out;
     ShellState shell_state;
-    char* command;
     StrVec args;
+    char* command;
+    char* in_path;
+    char* out_path;
 } Job;
 
-void job_init(Job* job, char* command, StrVec args, ShellState shell_state, FILE* in, FILE* out);
+void job_init(Job* job, char* command, StrVec args, ShellState shell_state, char* in_path, char* out_path);
 void job_execute(Job* job);
 
 #endif

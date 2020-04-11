@@ -1,1 +1,1 @@
-ls -l & echo "hello"
+ls

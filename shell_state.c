@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "shell_state.h"
+#include "job.h"
 
 void shell_init(ShellState* shell_state, bool batch) {
     StrVec search_path;
@@ -52,11 +53,9 @@ void execute_built_in(ShellState* shell_state, StrVec* tokens) {
     }
 }
 
-struct Job;
-
-void shell_execute(ShellState* shell_state, struct Job* job) {
-    if(vec_includes(&shell_state->built_in, vec_get(job->args, 0))) {
-        execute_built_in(shell_state, job->args);
+void shell_execute(ShellState* shell_state, Job job) {
+    if(vec_includes(&shell_state->built_in, vec_get(&job.args, 0))) {
+        execute_built_in(shell_state, &job.args);
         return;
     }
     

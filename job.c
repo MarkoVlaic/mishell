@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <string.h>
@@ -9,12 +11,12 @@
 #include "strvec.h"
 #include "shell_state.h"
 
-void job_init(Job* job, char* command, StrVec args, ShellState shell_state, FILE* in, FILE* out) {
+void job_init(Job* job, char* command, StrVec args, ShellState shell_state, char* in_path, char* out_path) {
     job->command = command;
     job->args = args;
     job->shell_state = shell_state;
-    job->in = in;
-    job->out = out;
+    job->in_path = in_path;
+    job->out_path = out_path;
 }
 
 void job_execute(Job* job) {
@@ -24,6 +26,14 @@ void job_execute(Job* job) {
         report_error();
         exit(2);
     } else if(pid == 0) {
+        if(job->out_path != NULL) {
+            int out_fd = open(job->out_path, O_WRONLY | O_TRUNC | O_CREAT, S_IRWXO | S_IRWXG | S_IRWXU);
+            //int err = write(out_fd, "jup life sucks", 14);
+            dup2(out_fd, STDOUT_FILENO);
+            close(out_fd);
+            //close(job->out_fd);
+        }
+
         char* exec_path = NULL; 
         StrVec search_path = job->shell_state.search_path;
 

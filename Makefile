@@ -1,6 +1,6 @@
 CFLAGS = -Wall -Werror
 
-mishell: mishell.o strvec.o job.o shell_state.o
+mishell: mishell.o strvec.o job.o shell_state.o job.h strvec.h shell_state.h
 	gcc $(CFLAGS) -o mishell mishell.o strvec.o job.o shell_state.o -g
 
 mishell.o: mishell.c strvec.c

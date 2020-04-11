@@ -30,12 +30,24 @@ void process_line(char* line) {
     separate(&parallel, line, "&");
 
     StrVec tokens;
-    vec_init(&tokens);
 
     for(int i=0;i<parallel.len;i++) {
         char* cmd = vec_get(&parallel, i);
+
+        char* out = strchr(cmd, '>');
+
+        if(out != NULL) {
+            *out = '\0';
+            out++;
+        }
+
+        vec_init(&tokens);
         separate(&tokens, cmd, " ");
-        shell_execute(&shell_state, &tokens);
+
+        Job job;
+        job_init(&job, vec_get(&tokens, 0), tokens, shell_state, NULL, out);
+
+        shell_execute(&shell_state, job);
         vec_clear(&tokens);
     }
 

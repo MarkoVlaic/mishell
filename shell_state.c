@@ -53,14 +53,14 @@ void execute_built_in(ShellState* shell_state, StrVec* tokens) {
     }
 }
 
-void shell_execute(ShellState* shell_state, StrVec* tokens) {
-    if(vec_includes(&shell_state->built_in, vec_get(tokens, 0))) {
-        execute_built_in(shell_state, tokens);
+void shell_execute(ShellState* shell_state, Job job) {
+    if(vec_includes(&shell_state->built_in, vec_get(&job.args, 0))) {
+        execute_built_in(shell_state, &job.args);
         return;
     }
     
-    Job job;
-    job_init(&job, vec_get(tokens, 0), *tokens, *shell_state, stdin, stdout);
+    //Job job;
+    //job_init(&job, vec_get(tokens, 0), *tokens, *shell_state, stdin, stdout);
     job_execute(&job);
     
 }

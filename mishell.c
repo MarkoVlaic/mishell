@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
@@ -16,6 +18,7 @@
 
 ShellState shell_state;
 StrVec built_in;
+
 
 void separate(StrVec* tokens, char* line, char* delim) {
     char* token;
@@ -100,8 +103,10 @@ void process_line(char* line) {
     }
 }
 
-void print_prompt(char* path) {
-    printf("~%s>  ", path);
+char* get_prompt(char* path) {
+    char* prompt = malloc(sizeof(char) * strlen(path) + 3);
+    sprintf(prompt, "~%s>  ", path);
+    return prompt;
 }
 
 
@@ -126,31 +131,37 @@ int main(int argc, char** argv) {
     }
 
     shell_init(&shell_state, batch);
-    
-    char* line = NULL;
-    size_t line_size = 0;
-    ssize_t bytes_read = 0;
 
     StrVec tokens;
     vec_init(&tokens);
 
     char* work_dir = getcwd(NULL, 0);
 
-    if(batch == 0)print_prompt(work_dir);
-
-    while( (bytes_read=getline(&line, &line_size, input_file))) {
-        if(bytes_read == -1) break;
-        
-        char* last = &line[strlen(line)-1];
-        if(*last == '\n')*last = '\0'; // Remove the newline (\n) character at the end of the line
-        
-        process_line(line);
-        
-        work_dir = getcwd(NULL, 0);
-        if(batch == 0)print_prompt(work_dir);
+    if(batch == 0) {
+        char* line;
+        while((line = readline(get_prompt(work_dir))) != NULL) {
+            if(strlen(line) > 0) {
+                add_history(line);
+            }
+            process_line(line);
+            work_dir = getcwd(NULL, 0);
+            free(line);
+        }
+    } else {
+        char* line = NULL;
+        size_t line_size = 0;
+        ssize_t bytes_read = 0;
+        while( (bytes_read=getline(&line, &line_size, input_file))) {
+            if(bytes_read == -1) break;
+            
+            char* last = &line[strlen(line)-1];
+            if(*last == '\n')*last = '\0'; // Remove the newline (\n) character at the end of the line
+            
+            process_line(line);
+            
+        }
     }
 
-    free(line);
     fclose(input_file);
     free(work_dir);
 

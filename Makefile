@@ -1,7 +1,7 @@
 CFLAGS = -Wall -Werror
 
 mishell: mishell.o strvec.o job.o shell_state.o job.h strvec.h shell_state.h
-	gcc $(CFLAGS) -o mishell mishell.o strvec.o job.o shell_state.o -g
+	gcc $(CFLAGS) -o mishell mishell.o strvec.o job.o shell_state.o -g -lreadline
 
 mishell.o: mishell.c strvec.c
 	gcc $(CFLAGS) -c mishell.c -g

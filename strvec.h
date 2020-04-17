@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <stdbool.h>
 
+// A vector of strings that is variable in size
 typedef struct StrVec {
     int len;
     size_t size;

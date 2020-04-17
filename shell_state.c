@@ -59,8 +59,6 @@ void shell_execute(ShellState* shell_state, Job job) {
         return;
     }
     
-    //Job job;
-    //job_init(&job, vec_get(tokens, 0), *tokens, *shell_state, stdin, stdout);
     job_execute(&job);
     
 }

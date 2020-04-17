@@ -52,7 +52,7 @@ void job_execute(Job* job) {
 
         for(int i=0;i<search_path.len;i++) {
             char* path = strdup(vec_get(&search_path, i));
-            int len = strlen(path) + strlen(job->command);
+            int len = strlen(path) + strlen(job->command) + 1;
             path = realloc(path, len * sizeof(char));
             strcat(path, job->command);
             //path[len-1] = '\0';

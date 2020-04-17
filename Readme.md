@@ -2,6 +2,7 @@ This simple shell implementation is my take on a project described in [this assi
 # Supported features
 
  - Running commands found in the search path (more in the built-in section). Ex: `ls -l`
+ - Multiple commands `ls & cat foo.txt & echo "bar"`
  - Output redirection `ls -l > foo.txt`
  - Pipes `ls -l | grep foo | wc`
  - Running a batch file containing a list of commands `./mishell batch.txt`
